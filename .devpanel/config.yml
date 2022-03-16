@@ -1,0 +1,39 @@
+version: "1.1"
+spec:
+  servicePort: 80
+  hostname: ""
+  sharedDir:
+    path: /var/www/html
+    storage: "5Gi"
+  podTemplate:
+    containers:
+      - name: php
+        image: "devpanel/php:7.4-fpm"
+        env:
+          - name: "APP_ROOT"
+            value: "/var/www/html"
+          - name: "WEB_ROOT"
+            value: "/var/www/html"
+          - name: "APP_TYPE"
+            value: "backdrop-cms"
+        ports:
+          - containerPort: 9000
+            name: fastcgi
+      - name: nginx
+        image: "devpanel/nginx:latest"
+        env:
+          - name: NGINX_SERVER_ROOT
+            value: "/var/www/html/"
+          - name: "NGINX_VHOST_PRESET"
+            value: "drupal7"
+          - name: NGINX_BACKEND_HOST
+            value: "0.0.0.0"
+          - name: NGINX_SET_REAL_IP_FROM
+            value: "10.0.0.0/16"
+          - name: NGINX_SERVER_EXTRA_CONF_FILEPATH
+            value: "/var/www/html/.devpanel/nginx-locations.conf"
+        ports:
+          - containerPort: 80
+            name: http
+          - containerPort: 443
+            name: https
